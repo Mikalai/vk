@@ -43,6 +43,8 @@ namespace Vk.Generator
         {
             switch (type)
             {
+                case ConstantDefinition.ConstantType.UInt16:
+                    return "ushort";
                 case ConstantDefinition.ConstantType.UInt32:
                     return "uint";
                 case ConstantDefinition.ConstantType.UInt64:

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace Vk.Generator
 {
@@ -15,6 +11,10 @@ namespace Vk.Generator
 
         public static string GetNameElement(this XElement xe)
         {
+            var aliasAttr = xe.Attribute("alias");
+            if (aliasAttr != null)
+                return null;
+
             return xe.Element("name").Value;
         }
 
@@ -39,6 +39,18 @@ namespace Vk.Generator
         public static bool HasCategoryAttribute(this XElement xe, string value)
         {
             var attr = xe.Attribute("category");
+            return attr != null && attr.Value == value;
+        }
+
+        public static bool IsAliasAttribute(this XElement xe)
+        {
+            var attr = xe.Attribute("alias");
+            return attr != null;
+        }
+
+        public static bool HasApiAttribute(this XElement xe, string value)
+        {
+            var attr = xe.Attribute("api");
             return attr != null && attr.Value == value;
         }
     }

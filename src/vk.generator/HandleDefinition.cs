@@ -18,6 +18,11 @@ namespace Vk.Generator
         public static HandleDefinition CreateFromXml(XElement xe)
         {
             Require.NotNull(xe);
+
+            var aliasAttr = xe.Attribute("alias");
+            if (aliasAttr != null)
+                return null;
+
             string name = xe.GetNameElement();
             bool dispatchable = xe.GetTypeElement() == "VK_DEFINE_HANDLE";
             string parent = xe.Attribute("parent")?.Value;

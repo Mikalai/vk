@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 
 namespace Vk.Generator
 {
@@ -6,8 +6,9 @@ namespace Vk.Generator
     {
         public static void WriteUnion(CsCodeWriter cw, TypeNameMappings tnm, StructureDefinition union)
         {
+            var isSafe = union.Members.All(o => o.Type.PointerIndirection == 0);
             cw.WriteLine("[StructLayout(LayoutKind.Explicit)]");
-            using (cw.PushBlock("public partial struct " + union.Name))
+            using (cw.PushBlock($"public{(isSafe ? " " : " unsafe ")}partial struct " + union.Name))
             {
                 foreach (var member in union.Members)
                 {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace Vk.Generator
 {
@@ -20,7 +19,7 @@ namespace Vk.Generator
 
         private ConstantType ParseType(string value)
         {
-            if (value.EndsWith("f"))
+            if (value.EndsWith("f") || value.EndsWith("F"))
             {
                 return ConstantType.Float32;
             }
@@ -47,6 +46,7 @@ namespace Vk.Generator
 
         public enum ConstantType
         {
+            UInt16,
             UInt32,
             UInt64,
             Float32,

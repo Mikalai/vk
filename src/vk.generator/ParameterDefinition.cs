@@ -1,14 +1,33 @@
-﻿using System;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
 namespace Vk.Generator
 {
     public class ParameterDefinition
     {
         public string Name { get; }
-        public TypeSpec Type { get;  }
+        public TypeSpec Type { get; }
         public ParameterModifier Modifier { get; }
         public bool IsOptional { get; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is not ParameterDefinition other)
+                return false;
+
+            return Name == other.Name
+                && Equals(Type, other.Type)
+                && Modifier == other.Modifier
+                && IsOptional == other.IsOptional;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = Name?.GetHashCode() ?? 0;
+            hash = (hash * 397) ^ (Type?.GetHashCode() ?? 0);
+            hash = (hash * 397) ^ Modifier.GetHashCode();
+            hash = (hash * 397) ^ IsOptional.GetHashCode();
+            return hash;
+        }
 
         public ParameterDefinition(string name, TypeSpec type, ParameterModifier modifier, bool isOptional)
         {
@@ -29,11 +48,10 @@ namespace Vk.Generator
             {
                 pointerLevel = 2;
             }
-            else if(xe.Value.Contains($"{typeName}*"))
+            else if (xe.Value.Contains($"{typeName}*"))
             {
                 pointerLevel = 1;
             }
-
 
             TypeSpec type = new TypeSpec(typeName, pointerLevel);
 

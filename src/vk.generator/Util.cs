@@ -18,6 +18,7 @@ namespace Vk.Generator
         {
             "object",
             "event",
+            "params",
         };
 
         public static int GetTypeSize(TypeSpec type)

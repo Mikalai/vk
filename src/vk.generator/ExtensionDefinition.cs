@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Xml.Linq;
 
 namespace Vk.Generator
@@ -13,6 +12,7 @@ namespace Vk.Generator
         public ExtensionConstant[] Constants { get; }
         public EnumExtensionValue[] EnumExtensions { get; }
         public string[] CommandNames { get; }
+        public string[] TypeNames { get; }
 
         public ExtensionDefinition(
             string name,
@@ -34,18 +34,31 @@ namespace Vk.Generator
         {
             string name = xe.GetNameAttribute();
             string numberString = xe.Attribute("number").Value;
-            int number = int.Parse(numberString);
+            int number = (int)float.Parse(numberString);
             string type = xe.GetTypeAttributeOrNull();
             List<ExtensionConstant> extensionConstants = new List<ExtensionConstant>();
             List<EnumExtensionValue> enumExtensions = new List<EnumExtensionValue>();
             List<string> commandNames = new List<string>();
+            List<string> typeNames = new List<string>();
 
             foreach (var require in xe.Elements("require"))
             {
+                foreach (var typeXE in require.Elements("type"))
+                {
+                    var typeName = typeXE.GetNameAttribute();
+                    if (typeName != null)
+                    {
+                        typeNames.Add(typeName);
+                    }
+                }
                 foreach (var enumXE in require.Elements("enum"))
                 {
                     string enumName = enumXE.GetNameAttribute();
                     string extends = enumXE.Attribute("extends")?.Value;
+
+                    if (enumXE.Attribute("alias") != null)
+                        continue;
+
                     if (extends != null)
                     {
                         string valueString;
@@ -72,6 +85,8 @@ namespace Vk.Generator
                             }
                             else
                             {
+                                if (enumXE.Attribute("alias") != null)
+                                    continue;
                                 valueString = enumXE.Attribute("value").Value;
                             }
                         }

@@ -17,6 +17,7 @@ namespace Vk.Generator
         private static readonly Dictionary<string, string> s_knownEnumValueNames = new Dictionary<string, string>
         {
             {  "VK_STENCIL_FRONT_AND_BACK", "FrontAndBack" },
+            {  "VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_FLAGS_INFO", "MemoryAllocateFlags" },
             // VkStructureType
 
             // VkSampleCountFlagBits

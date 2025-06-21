@@ -1,38 +1,46 @@
 using System;
-using System.IO;
-using System.CommandLine;
 using System.Collections.Generic;
+using System.CommandLine;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Vk.Generator
 {
     public class Program
     {
-        public static int Main(string[] args)
+        public static async Task<int> Main(string[] args)
         {
-            string outputPath = AppContext.BaseDirectory;
+            var outputOption = new Option<string>(
+                aliases: new[] { "-o", "--out" },
+                description: "The folder into which code is generated. Defaults to the application directory.",
+                getDefaultValue: () => AppContext.BaseDirectory
+            );
 
-            ArgumentSyntax.Parse(args, s =>
+            var rootCommand = new RootCommand("Vulkan code generator")
             {
-                s.DefineOption("o|out", ref outputPath, "The folder into which code is generated. Defaults to the application directory.");
-            });
+                outputOption
+            };
 
-            Configuration.CodeOutputPath = outputPath;
+            rootCommand.SetHandler((string outputPath) =>
+            {
+                Configuration.CodeOutputPath = outputPath;
 
-            if (File.Exists(outputPath))
-            {
-                Console.Error.WriteLine("The given path is a file, not a folder.");
-                return 1;
-            }
-            else if (!Directory.Exists(outputPath))
-            {
-                Directory.CreateDirectory(outputPath);
-            }
+                if (File.Exists(outputPath))
+                {
+                    Console.Error.WriteLine("The given path is a file, not a folder.");
+                    Environment.Exit(1);
+                }
+                else if (!Directory.Exists(outputPath))
+                {
+                    Directory.CreateDirectory(outputPath);
+                }
 
-            using (var fs = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "vk.xml")))
-            {
+                using var fs = File.OpenRead(Path.Combine(AppContext.BaseDirectory, "vk.xml"));
                 VulkanSpecification vs = VulkanSpecification.LoadFromXmlStream(fs);
+
                 TypeNameMappings tnm = new TypeNameMappings();
-                foreach (var typedef in vs.Typedefs)
+                foreach (var typedef in vs.Typedefs.ToArray())
                 {
                     if (typedef.Requires != null)
                     {
@@ -61,9 +69,9 @@ namespace Vk.Generator
                 }
 
                 CodeGenerator.GenerateCodeFiles(vs, tnm, Configuration.CodeOutputPath);
-            }
+            }, outputOption);
 
-            return 0;
+            return await rootCommand.InvokeAsync(args);
         }
     }
 }

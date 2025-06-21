@@ -19,7 +19,9 @@ namespace Vk.Generator
             Require.NotNull(xe);
 
             string name = xe.GetNameAttribute();
-            MemberSpec[] members = xe.Elements("member").Select(memberx => MemberSpec.CreateFromXml(memberx)).ToArray();
+            MemberSpec[] members = xe.Elements("member")
+                .Where(memberx => !memberx.HasApiAttribute("vulkansc"))
+                .Select(memberx => MemberSpec.CreateFromXml(memberx)).ToArray();
             return new StructureDefinition(name, members);
         }
 
